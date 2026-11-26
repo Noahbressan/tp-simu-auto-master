@@ -1,0 +1,468 @@
+[
+    {
+        "id": "tab_verin",
+        "type": "tab",
+        "label": "Supervision VR-01",
+        "disabled": false,
+        "info": "Supervision du vérin VR-01 (automate simulé : server.py).\nTable Modbus : src/tp_simu_auto/modbus_map.py\n\n- Lectures cycliques : coils 0-8, discrete inputs 0-6, input registers 0-5 (200 ms), holding registers 0-2 (1 s)\n- « Modèle supervision » : alarmes, journal, actions opérateur -> écritures Modbus\n- « Écran de supervision » : interface opérateur (ui-template)"
+    },
+    {
+        "id": "cfg_modbus",
+        "type": "modbus-client",
+        "name": "Automate (server.py)",
+        "clienttype": "tcp",
+        "bufferCommands": true,
+        "stateLogEnabled": false,
+        "queueLogEnabled": false,
+        "failureLogEnabled": true,
+        "tcpHost": "127.0.0.1",
+        "tcpPort": "502",
+        "tcpType": "DEFAULT",
+        "serialPort": "/dev/ttyUSB0",
+        "serialType": "RTU-BUFFERD",
+        "serialBaudrate": "9600",
+        "serialDatabits": "8",
+        "serialStopbits": "1",
+        "serialParity": "none",
+        "serialConnectionDelay": "100",
+        "serialAsciiResponseStartDelimiter": "0x3A",
+        "unit_id": "1",
+        "commandDelay": "1",
+        "clientTimeout": "1000",
+        "reconnectOnTimeout": true,
+        "reconnectTimeout": "2000",
+        "parallelUnitIdsAllowed": true
+    },
+    {
+        "id": "cfg_ui_base",
+        "type": "ui-base",
+        "name": "Supervision VR-01",
+        "path": "/dashboard",
+        "appIcon": "",
+        "includeClientData": true,
+        "acceptsClientConfig": [
+            "ui-notification",
+            "ui-control"
+        ],
+        "showPathInSidebar": false,
+        "headerContent": "page",
+        "navigationStyle": "none",
+        "titleBarStyle": "hidden",
+        "showReconnectNotification": true,
+        "notificationDisplayTime": 1,
+        "showDisconnectNotification": true,
+        "allowInstall": false
+    },
+    {
+        "id": "cfg_ui_theme",
+        "type": "ui-theme",
+        "name": "Thème supervision",
+        "colors": {
+            "surface": "#1e242b",
+            "primary": "#3aa3ff",
+            "bgPage": "#15191e",
+            "groupBg": "#15191e",
+            "groupOutline": "#15191e"
+        },
+        "sizes": {
+            "density": "default",
+            "pagePadding": "12px",
+            "groupGap": "12px",
+            "groupBorderRadius": "6px",
+            "widgetGap": "12px"
+        }
+    },
+    {
+        "id": "cfg_ui_page",
+        "type": "ui-page",
+        "name": "Supervision",
+        "ui": "cfg_ui_base",
+        "path": "/verin",
+        "icon": "factory",
+        "layout": "grid",
+        "theme": "cfg_ui_theme",
+        "breakpoints": [
+            {
+                "name": "Default",
+                "px": 0,
+                "cols": 3
+            },
+            {
+                "name": "Tablet",
+                "px": 576,
+                "cols": 6
+            },
+            {
+                "name": "Small Desktop",
+                "px": 768,
+                "cols": 9
+            },
+            {
+                "name": "Desktop",
+                "px": 1024,
+                "cols": 12
+            }
+        ],
+        "order": 1,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "grp_hmi",
+        "type": "ui-group",
+        "name": "Supervision",
+        "page": "cfg_ui_page",
+        "width": 12,
+        "height": 1,
+        "order": 1,
+        "showTitle": false,
+        "className": "",
+        "visible": "true",
+        "disabled": "false",
+        "groupType": "default"
+    },
+    {
+        "id": "cmt_lecture",
+        "type": "comment",
+        "z": "tab_verin",
+        "name": "Acquisition des données de l'automate",
+        "info": "",
+        "x": 200,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "read_coils",
+        "type": "modbus-read",
+        "z": "tab_verin",
+        "name": "Coils 0-8 (demandes)",
+        "showStatusActivities": false,
+        "logIOActivities": false,
+        "showErrors": true,
+        "showWarnings": true,
+        "unitid": "1",
+        "dataType": "Coil",
+        "adr": "0",
+        "quantity": "9",
+        "rate": "200",
+        "rateUnit": "ms",
+        "delayOnStart": false,
+        "startDelayTime": "",
+        "server": "cfg_modbus",
+        "useIOFile": false,
+        "ioFile": "",
+        "useIOForPayload": false,
+        "emptyMsgOnFail": false,
+        "x": 190,
+        "y": 80,
+        "wires": [
+            [
+                "topic_coils"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "topic_coils",
+        "type": "change",
+        "z": "tab_verin",
+        "name": "topic = coils",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "coils",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 430,
+        "y": 80,
+        "wires": [
+            [
+                "fn_modele"
+            ]
+        ]
+    },
+    {
+        "id": "read_di",
+        "type": "modbus-read",
+        "z": "tab_verin",
+        "name": "Discrete inputs 0-6 (état)",
+        "showStatusActivities": false,
+        "logIOActivities": false,
+        "showErrors": true,
+        "showWarnings": true,
+        "unitid": "1",
+        "dataType": "Input",
+        "adr": "0",
+        "quantity": "7",
+        "rate": "200",
+        "rateUnit": "ms",
+        "delayOnStart": false,
+        "startDelayTime": "",
+        "server": "cfg_modbus",
+        "useIOFile": false,
+        "ioFile": "",
+        "useIOForPayload": false,
+        "emptyMsgOnFail": false,
+        "x": 190,
+        "y": 140,
+        "wires": [
+            [
+                "topic_di"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "topic_di",
+        "type": "change",
+        "z": "tab_verin",
+        "name": "topic = di",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "di",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 430,
+        "y": 140,
+        "wires": [
+            [
+                "fn_modele"
+            ]
+        ]
+    },
+    {
+        "id": "read_ir",
+        "type": "modbus-read",
+        "z": "tab_verin",
+        "name": "Input registers 0-5 (mesures)",
+        "showStatusActivities": false,
+        "logIOActivities": false,
+        "showErrors": true,
+        "showWarnings": true,
+        "unitid": "1",
+        "dataType": "InputRegister",
+        "adr": "0",
+        "quantity": "6",
+        "rate": "200",
+        "rateUnit": "ms",
+        "delayOnStart": false,
+        "startDelayTime": "",
+        "server": "cfg_modbus",
+        "useIOFile": false,
+        "ioFile": "",
+        "useIOForPayload": false,
+        "emptyMsgOnFail": false,
+        "x": 190,
+        "y": 200,
+        "wires": [
+            [
+                "topic_ir"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "topic_ir",
+        "type": "change",
+        "z": "tab_verin",
+        "name": "topic = ir",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "ir",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 430,
+        "y": 200,
+        "wires": [
+            [
+                "fn_modele"
+            ]
+        ]
+    },
+    {
+        "id": "read_hr",
+        "type": "modbus-read",
+        "z": "tab_verin",
+        "name": "Holding registers 0-2 (paramètres)",
+        "showStatusActivities": false,
+        "logIOActivities": false,
+        "showErrors": true,
+        "showWarnings": true,
+        "unitid": "1",
+        "dataType": "HoldingRegister",
+        "adr": "0",
+        "quantity": "3",
+        "rate": "1000",
+        "rateUnit": "ms",
+        "delayOnStart": false,
+        "startDelayTime": "",
+        "server": "cfg_modbus",
+        "useIOFile": false,
+        "ioFile": "",
+        "useIOForPayload": false,
+        "emptyMsgOnFail": false,
+        "x": 190,
+        "y": 260,
+        "wires": [
+            [
+                "topic_hr"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "topic_hr",
+        "type": "change",
+        "z": "tab_verin",
+        "name": "topic = hr",
+        "rules": [
+            {
+                "t": "set",
+                "p": "topic",
+                "pt": "msg",
+                "to": "hr",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 430,
+        "y": 260,
+        "wires": [
+            [
+                "fn_modele"
+            ]
+        ]
+    },
+    {
+        "id": "tick_comm",
+        "type": "inject",
+        "z": "tab_verin",
+        "name": "Toutes les secondes",
+        "props": [
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "1",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "1",
+        "topic": "tick",
+        "x": 190,
+        "y": 320,
+        "wires": [
+            [
+                "fn_modele"
+            ]
+        ]
+    },
+    {
+        "id": "cmt_modele",
+        "type": "comment",
+        "z": "tab_verin",
+        "name": "Supervision : alarmes, journal, commandes opérateur",
+        "info": "",
+        "x": 230,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "fn_modele",
+        "type": "function",
+        "z": "tab_verin",
+        "name": "Modèle supervision",
+        "func": "// Modèle de supervision du vérin VR-01.\n// Table Modbus : voir src/tp_simu_auto/modbus_map.py\n//\n// Entrées (msg.topic) :\n//   'coils' / 'di' / 'ir' / 'hr' : lectures cycliques de l'automate\n//   'tick'                       : horloge 1 s (surveillance de la communication)\n//   'ihm'                        : action opérateur, msg.payload = { action, ... }\n// Sorties : [état complet pour l'écran, écritures Modbus (modbus-flex-write)]\n\nconst UNIT_ID = 1;\nconst TIMEOUT_COMM_MS = 1000;\nconst TAILLE_JOURNAL = 100;\n\nconst COIL = { DEPART: 0, ARRET: 1, MANUEL: 2, JOG_SORTIE: 3, JOG_RENTREE: 4, AU: 5, REARMEMENT: 6, SIMU_BLOCAGE: 7, SIMU_PRESSION: 8 };\nconst DI = { Y1: 0, Y2: 1, B1: 2, B2: 3, CYCLE: 4, DEFAUT: 5, ARRET_FIN_CYCLE: 6 };\nconst IR = { POSITION: 0, ETAPE: 1, DEFAUTS: 2, CYCLES: 3, DUREE_SORTIE: 4, DUREE_RENTREE: 5 };\nconst ETAPES = ['Repos', 'Sortie', 'Tempo haut', 'Rentrée', 'Manuel', 'Défaut'];\nconst DEFAUTS = [\n    { bit: 1, code: 'AU', texte: 'Arrêt d\\'urgence enclenché' },\n    { bit: 2, code: 'TO_SORTIE', texte: 'Défaut sortie : capteur B2 non atteint dans le temps imparti' },\n    { bit: 4, code: 'TO_RENTREE', texte: 'Défaut rentrée : capteur B1 non atteint dans le temps imparti' },\n    { bit: 8, code: 'BLOCAGE', texte: 'Vérin bloqué : aucun mouvement malgré la commande' }\n];\n\nconst now = Date.now();\nconst st = context.get('st') || {\n    coils: null, di: null, ir: null, hr: null,\n    derniereLecture: now,       // délai de grâce au démarrage\n    commPrec: null,\n    sens: 'descente',\n    prec: null,\n    alarmes: [],\n    journal: [],\n    seq: 0\n};\n\nfunction journaliser(type, texte) {\n    st.journal.unshift({ t: now, type, texte });\n    if (st.journal.length > TAILLE_JOURNAL) st.journal.length = TAILLE_JOURNAL;\n}\n\n// Une alarme apparaît quand sa condition devient vraie et reste affichée tant\n// qu'elle est active ou non acquittée.\nfunction alarme(code, texte, condition) {\n    const active = st.alarmes.find(a => a.code === code && a.active);\n    if (condition && !active) {\n        st.alarmes.unshift({ id: ++st.seq, code, texte, t: now, active: true, acquittee: false });\n        journaliser('alarme', texte);\n    } else if (!condition && active) {\n        active.active = false;\n        journaliser('info', 'Disparition : ' + texte);\n        // Une alarme disparue et déjà acquittée quitte la liste\n        if (active.acquittee) st.alarmes = st.alarmes.filter(a => a !== active);\n    }\n}\n\nconst ecritures = [];\nfunction ecrireCoil(adresse, valeur) {\n    ecritures.push({ payload: { value: valeur, fc: 5, unitid: UNIT_ID, address: adresse, quantity: 1 } });\n}\n\nlet emettre = true;\n\nswitch (msg.topic) {\n    case 'coils': st.coils = msg.payload; emettre = false; break;\n    case 'di': st.di = msg.payload; emettre = false; break;\n    case 'hr': st.hr = msg.payload; emettre = false; break;\n    case 'ir':\n        st.ir = msg.payload;\n        st.derniereLecture = now;\n        break;\n    case 'ihm': {\n        const a = msg.payload || {};\n        emettre = false;\n        switch (a.action) {\n            case 'depart':\n                ecrireCoil(COIL.DEPART, true);\n                journaliser('operateur', 'Départ cycle demandé');\n                break;\n            case 'arret':\n                ecrireCoil(COIL.ARRET, true);\n                journaliser('operateur', 'Arrêt en fin de cycle demandé');\n                break;\n            case 'mode':\n                ecrireCoil(COIL.JOG_SORTIE, false);\n                ecrireCoil(COIL.JOG_RENTREE, false);\n                ecrireCoil(COIL.MANUEL, a.manuel === true);\n                journaliser('operateur', 'Passage en mode ' + (a.manuel ? 'MANUEL' : 'AUTOMATIQUE'));\n                break;\n            case 'jog':\n                ecrireCoil(a.sens === 'sortie' ? COIL.JOG_SORTIE : COIL.JOG_RENTREE, a.actif === true);\n                break;\n            case 'au':\n                ecrireCoil(COIL.AU, a.actif === true);\n                journaliser(a.actif ? 'alarme' : 'operateur', a.actif ? 'Arrêt d\\'urgence actionné' : 'Arrêt d\\'urgence déverrouillé');\n                break;\n            case 'acquitter':\n                st.alarmes.forEach(x => { x.acquittee = true; });\n                st.alarmes = st.alarmes.filter(x => x.active);\n                ecrireCoil(COIL.REARMEMENT, true);\n                journaliser('operateur', 'Acquittement et réarmement des défauts');\n                emettre = true;\n                break;\n            case 'simu':\n                ecrireCoil(a.defaut === 'blocage' ? COIL.SIMU_BLOCAGE : COIL.SIMU_PRESSION, a.actif === true);\n                journaliser('simulation', (a.actif ? 'Activation' : 'Désactivation') + ' de la simulation : '\n                    + (a.defaut === 'blocage' ? 'blocage mécanique' : 'pression d\\'air basse'));\n                break;\n            case 'parametres': {\n                const v = [a.tempoHaut, a.timeoutSortie, a.timeoutRentree].map(x => Math.round(Number(x) * 10));\n                if (v.some(x => !Number.isFinite(x) || x < 0 || x > 6000)) break;\n                ecritures.push({ payload: { value: v, fc: 16, unitid: UNIT_ID, address: 0, quantity: 3 } });\n                journaliser('operateur', 'Paramètres modifiés : tempo haut ' + a.tempoHaut + ' s, timeout sortie '\n                    + a.timeoutSortie + ' s, timeout rentrée ' + a.timeoutRentree + ' s');\n                break;\n            }\n        }\n        break;\n    }\n}\n\n// --- Communication ---\nconst comm = now - st.derniereLecture < TIMEOUT_COMM_MS && st.ir !== null;\nif (st.commPrec === false && comm) journaliser('info', 'Communication automate rétablie');\nst.commPrec = comm;\nalarme('COMM', 'Perte de communication avec l\\'automate', !comm && now - (context.get('demarrage') || now) > 2000);\nif (!context.get('demarrage')) context.set('demarrage', now);\n\n// --- État de l'automate ---\nconst c = st.coils || [], d = st.di || [], r = st.ir || [], h = st.hr || [];\nconst etat = {\n    position: (r[IR.POSITION] || 0) / 10,\n    etape: r[IR.ETAPE] || 0,\n    defauts: r[IR.DEFAUTS] || 0,\n    cycles: r[IR.CYCLES] || 0,\n    dureeSortie: r[IR.DUREE_SORTIE] ? r[IR.DUREE_SORTIE] / 10 : null,\n    dureeRentree: r[IR.DUREE_RENTREE] ? r[IR.DUREE_RENTREE] / 10 : null,\n    y1: d[DI.Y1] === true, y2: d[DI.Y2] === true,\n    b1: d[DI.B1] === true, b2: d[DI.B2] === true,\n    cycleEnCours: d[DI.CYCLE] === true,\n    arretFinCycle: d[DI.ARRET_FIN_CYCLE] === true,\n    manuel: c[COIL.MANUEL] === true,\n    au: c[COIL.AU] === true,\n    jogSortie: c[COIL.JOG_SORTIE] === true,\n    jogRentree: c[COIL.JOG_RENTREE] === true,\n    simuBlocage: c[COIL.SIMU_BLOCAGE] === true,\n    simuPression: c[COIL.SIMU_PRESSION] === true,\n    parametres: h.length >= 3 ? { tempoHaut: h[0] / 10, timeoutSortie: h[1] / 10, timeoutRentree: h[2] / 10 } : null\n};\n\nif (etat.y1) st.sens = 'montee';\nelse if (etat.y2) st.sens = 'descente';\n\n// Alarmes issues du mot de défauts de l'automate (mémorisées jusqu'au réarmement)\nif (comm) {\n    for (const def of DEFAUTS) alarme(def.code, def.texte, (etat.defauts & def.bit) !== 0);\n\n    // Journal des changements d'état significatifs\n    const p = st.prec;\n    if (p) {\n        if (etat.manuel !== p.manuel) journaliser('info', 'Automate en mode ' + (etat.manuel ? 'MANUEL' : 'AUTOMATIQUE'));\n        if (etat.cycleEnCours && !p.cycleEnCours) journaliser('info', 'Cycle automatique démarré');\n        if (!etat.cycleEnCours && p.cycleEnCours) journaliser('info', d[DI.DEFAUT] === true ? 'Cycle interrompu par un défaut' : 'Cycle automatique terminé, vérin au repos');\n        if (etat.defauts === 0 && p.defauts !== 0) journaliser('info', 'Automate réarmé, défauts effacés');\n    }\n    st.prec = { manuel: etat.manuel, cycleEnCours: etat.cycleEnCours, defauts: etat.defauts };\n}\n\ncontext.set('st', st);\n\nlet etatMachine;\nif (!comm) etatMachine = { code: 'hors-ligne', texte: 'HORS LIGNE' };\nelse if (etat.au) etatMachine = { code: 'au', texte: 'ARRÊT D\\'URGENCE' };\nelse if (etat.defauts) etatMachine = { code: 'defaut', texte: 'EN DÉFAUT' };\nelse if (etat.manuel) etatMachine = { code: 'manuel', texte: 'MANUEL' };\nelse if (etat.cycleEnCours) etatMachine = { code: 'cycle', texte: 'EN CYCLE' };\nelse etatMachine = { code: 'arret', texte: 'À L\\'ARRÊT' };\n\nconst sortieIhm = !emettre ? null : {\n    payload: Object.assign(etat, {\n        t: now,\n        comm,\n        sens: st.sens,\n        fin: etat.b2 ? 'max' : (etat.b1 ? 'min' : null),\n        nomEtape: ETAPES[etat.etape] || '?',\n        etatMachine,\n        alarmes: st.alarmes.slice(0, 30),\n        journal: st.journal.slice(0, 60)\n    })\n};\n\nreturn [sortieIhm, ecritures.length ? ecritures : null];\n",
+        "outputs": 2,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 690,
+        "y": 200,
+        "wires": [
+            [
+                "ihm_supervision"
+            ],
+            [
+                "write_modbus"
+            ]
+        ]
+    },
+    {
+        "id": "ihm_supervision",
+        "type": "ui-template",
+        "z": "tab_verin",
+        "group": "grp_hmi",
+        "page": "",
+        "ui": "",
+        "name": "Écran de supervision",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "head": "",
+        "format": "<template>\n    <div class=\"hmi\">\n        <!-- ===== Bandeau supérieur ===== -->\n        <header class=\"hmi-entete\">\n            <div class=\"hmi-ident\">\n                <div class=\"hmi-logo\">VR</div>\n                <div>\n                    <div class=\"hmi-ligne\">Ligne d'assemblage · Poste 01</div>\n                    <div class=\"hmi-titre\">VR-01 — Vérin pneumatique Festo</div>\n                </div>\n            </div>\n            <div class=\"hmi-bandeau\" :class=\"bandeau.classe\">\n                <span class=\"hmi-bandeau-icone\">{{ bandeau.icone }}</span>\n                <span class=\"hmi-bandeau-texte\">{{ bandeau.texte }}</span>\n            </div>\n            <div class=\"hmi-statuts\">\n                <span class=\"hmi-pastille\" :class=\"e.comm ? 'ok' : 'defaut'\">\n                    <i></i>{{ e.comm ? 'AUTOMATE EN LIGNE' : 'AUTOMATE HORS LIGNE' }}\n                </span>\n                <span class=\"hmi-pastille neutre\"><i></i>MODE {{ e.manuel ? 'MANUEL' : 'AUTO' }}</span>\n                <span class=\"hmi-pastille etat\" :class=\"e.etatMachine.code\"><i></i>{{ e.etatMachine.texte }}</span>\n                <div class=\"hmi-horloge\">\n                    <div class=\"hmi-heure\">{{ heure(maintenant) }}</div>\n                    <div class=\"hmi-date\">{{ dateLongue }}</div>\n                </div>\n            </div>\n        </header>\n\n        <main class=\"hmi-grille\">\n            <!-- ===== Synoptique ===== -->\n            <section class=\"hmi-panneau hmi-synoptique\" :class=\"{ 'en-defaut': e.comm && e.defauts }\">\n                <div class=\"hmi-panneau-titre\">\n                    <span>Synoptique</span>\n                    <span v-if=\"e.comm && e.fin === 'max'\" class=\"hmi-butee max clignote\">▲ HAUTEUR MAX</span>\n                    <span v-else-if=\"e.comm && e.fin === 'min'\" class=\"hmi-butee min clignote\">▼ HAUTEUR MIN</span>\n                </div>\n                <svg class=\"hmi-svg\" viewBox=\"0 0 420 370\" preserveAspectRatio=\"xMidYMid meet\">\n                    <defs>\n                        <linearGradient id=\"vr-corps\" x1=\"0\" x2=\"1\">\n                            <stop offset=\"0\" stop-color=\"#6f7a86\"/>\n                            <stop offset=\"0.45\" stop-color=\"#c3cbd4\"/>\n                            <stop offset=\"1\" stop-color=\"#66717d\"/>\n                        </linearGradient>\n                        <linearGradient id=\"vr-tige\" x1=\"0\" x2=\"1\">\n                            <stop offset=\"0\" stop-color=\"#9aa4ae\"/>\n                            <stop offset=\"0.5\" stop-color=\"#f1f4f7\"/>\n                            <stop offset=\"1\" stop-color=\"#8b959f\"/>\n                        </linearGradient>\n                        <pattern id=\"vr-hachures\" width=\"8\" height=\"8\" patternUnits=\"userSpaceOnUse\" patternTransform=\"rotate(45)\">\n                            <line x1=\"0\" y1=\"0\" x2=\"0\" y2=\"8\" stroke=\"#3a424c\" stroke-width=\"2\"/>\n                        </pattern>\n                    </defs>\n\n                    <!-- Barre de position -->\n                    <rect x=\"44\" y=\"40\" width=\"24\" height=\"290\" rx=\"4\" fill=\"#20262d\" stroke=\"#333b44\"/>\n                    <rect x=\"44\" :y=\"330 - hauteurBarre\" width=\"24\" :height=\"hauteurBarre\" rx=\"4\" :fill=\"couleurSens\" class=\"vr-anim\"/>\n                    <g v-for=\"g in [0, 25, 50, 75, 100]\" :key=\"'g' + g\">\n                        <line x1=\"68\" x2=\"74\" :y1=\"330 - g * 2.9\" :y2=\"330 - g * 2.9\" stroke=\"#5b6672\"/>\n                        <text x=\"38\" :y=\"334 - g * 2.9\" class=\"vr-graduation\" text-anchor=\"end\">{{ g }}</text>\n                    </g>\n                    <text x=\"56\" y=\"352\" class=\"vr-legende\" text-anchor=\"middle\">mm</text>\n\n                    <!-- Bâti -->\n                    <rect x=\"112\" y=\"336\" width=\"160\" height=\"12\" fill=\"#3a424c\"/>\n                    <rect x=\"112\" y=\"348\" width=\"160\" height=\"12\" fill=\"url(#vr-hachures)\"/>\n\n                    <!-- Tige et charge -->\n                    <rect x=\"182\" :y=\"ySommetTige\" width=\"16\" :height=\"186 - ySommetTige\" fill=\"url(#vr-tige)\" class=\"vr-anim\"/>\n                    <g class=\"vr-anim\" :transform=\"'translate(0,' + (ySommetTige - 160) + ')'\">\n                        <rect x=\"158\" y=\"134\" width=\"64\" height=\"26\" rx=\"3\" fill=\"#4a5561\" stroke=\"#5f6b78\"/>\n                        <text x=\"190\" y=\"151\" class=\"vr-charge\" text-anchor=\"middle\">CHARGE</text>\n                    </g>\n\n                    <!-- Corps du vérin -->\n                    <rect x=\"150\" y=\"180\" width=\"80\" height=\"150\" rx=\"5\" fill=\"url(#vr-corps)\"/>\n                    <rect x=\"144\" y=\"172\" width=\"92\" height=\"14\" rx=\"2\" fill=\"#4a535d\"/>\n                    <rect x=\"144\" y=\"324\" width=\"92\" height=\"14\" rx=\"2\" fill=\"#4a535d\"/>\n                    <rect x=\"184\" y=\"192\" width=\"12\" height=\"128\" rx=\"2\" fill=\"#1b2026\"/>\n                    <rect x=\"181\" :y=\"yPiston\" width=\"18\" height=\"10\" rx=\"2\" :fill=\"couleurSens\" class=\"vr-anim\"/>\n                    <text x=\"190\" y=\"362\" class=\"vr-repere\" text-anchor=\"middle\">VR-01 · course 100 mm</text>\n\n                    <!-- Capteurs de fin de course -->\n                    <rect x=\"136\" y=\"191\" width=\"14\" height=\"10\" rx=\"2\" fill=\"#2b3138\"/>\n                    <circle cx=\"126\" cy=\"196\" r=\"5\" :fill=\"e.comm && e.b2 ? '#3ddc68' : '#3a424c'\" :class=\"{ 'vr-led': e.comm && e.b2 }\"/>\n                    <text x=\"116\" y=\"200\" class=\"vr-capteur\" text-anchor=\"end\">B2</text>\n                    <rect x=\"136\" y=\"301\" width=\"14\" height=\"10\" rx=\"2\" fill=\"#2b3138\"/>\n                    <circle cx=\"126\" cy=\"306\" r=\"5\" :fill=\"e.comm && e.b1 ? '#3ddc68' : '#3a424c'\" :class=\"{ 'vr-led': e.comm && e.b1 }\"/>\n                    <text x=\"116\" y=\"310\" class=\"vr-capteur\" text-anchor=\"end\">B1</text>\n\n                    <!-- Conduites : A alimente la chambre basse (sortie), B la chambre haute (rentrée) -->\n                    <path d=\"M236 196 H334 V232\" fill=\"none\" stroke-width=\"4\" :stroke=\"couleurConduite(e.y2)\" :class=\"{ 'vr-flux': e.comm && e.y2 }\"/>\n                    <path d=\"M236 306 H248 V214 H322 V232\" fill=\"none\" stroke-width=\"4\" :stroke=\"couleurConduite(e.y1)\" :class=\"{ 'vr-flux': e.comm && e.y1 }\"/>\n\n                    <!-- Distributeur 5/3 centre fermé -->\n                    <rect x=\"274\" y=\"232\" width=\"36\" height=\"36\" :class=\"['vr-case', { active: e.comm && e.y1 }]\"/>\n                    <rect x=\"310\" y=\"232\" width=\"36\" height=\"36\" :class=\"['vr-case', { active: e.comm && !e.y1 && !e.y2 }]\"/>\n                    <rect x=\"346\" y=\"232\" width=\"36\" height=\"36\" :class=\"['vr-case', { active: e.comm && e.y2 }]\"/>\n                    <g class=\"vr-symbole\">\n                        <line x1=\"284\" y1=\"264\" x2=\"284\" y2=\"237\"/><path d=\"M280 242 L284 236 L288 242\"/>\n                        <line x1=\"300\" y1=\"237\" x2=\"300\" y2=\"264\"/><path d=\"M296 259 L300 265 L304 259\"/>\n                        <line x1=\"322\" y1=\"236\" x2=\"322\" y2=\"242\"/><line x1=\"318\" y1=\"242\" x2=\"326\" y2=\"242\"/>\n                        <line x1=\"334\" y1=\"236\" x2=\"334\" y2=\"242\"/><line x1=\"330\" y1=\"242\" x2=\"338\" y2=\"242\"/>\n                        <line x1=\"322\" y1=\"264\" x2=\"322\" y2=\"258\"/><line x1=\"318\" y1=\"258\" x2=\"326\" y2=\"258\"/>\n                        <line x1=\"334\" y1=\"264\" x2=\"334\" y2=\"258\"/><line x1=\"330\" y1=\"258\" x2=\"338\" y2=\"258\"/>\n                        <line x1=\"354\" y1=\"264\" x2=\"374\" y2=\"238\"/><line x1=\"374\" y1=\"264\" x2=\"354\" y2=\"238\"/>\n                    </g>\n                    <rect x=\"256\" y=\"238\" width=\"18\" height=\"24\" :fill=\"e.comm && e.y1 ? '#f5a524' : '#2b3138'\" stroke=\"#5b6672\"/>\n                    <text x=\"265\" y=\"254\" class=\"vr-bobine\" text-anchor=\"middle\" :fill=\"e.comm && e.y1 ? '#1b1f24' : '#9aa4ae'\">Y1</text>\n                    <rect x=\"382\" y=\"238\" width=\"18\" height=\"24\" :fill=\"e.comm && e.y2 ? '#f5a524' : '#2b3138'\" stroke=\"#5b6672\"/>\n                    <text x=\"391\" y=\"254\" class=\"vr-bobine\" text-anchor=\"middle\" :fill=\"e.comm && e.y2 ? '#1b1f24' : '#9aa4ae'\">Y2</text>\n                    <text x=\"391\" y=\"230\" class=\"vr-legende\" text-anchor=\"middle\">5/3</text>\n\n                    <!-- Alimentation et échappement -->\n                    <line x1=\"316\" y1=\"268\" x2=\"316\" y2=\"300\" stroke=\"#3aa3ff\" stroke-width=\"4\"/>\n                    <path d=\"M308 312 L316 300 L324 312 Z\" fill=\"#3aa3ff\"/>\n                    <text x=\"316\" y=\"326\" class=\"vr-legende\" text-anchor=\"middle\">P</text>\n                    <line x1=\"340\" y1=\"268\" x2=\"340\" y2=\"300\" stroke=\"#5b6672\" stroke-width=\"3\"/>\n                    <path d=\"M332 300 L348 300 L340 312 Z\" fill=\"none\" stroke=\"#5b6672\" stroke-width=\"2\"/>\n                    <text x=\"340\" y=\"326\" class=\"vr-legende\" text-anchor=\"middle\">R</text>\n\n                    <!-- Défaut simulé -->\n                    <g v-if=\"e.comm && (e.simuBlocage || e.simuPression)\">\n                        <rect x=\"226\" y=\"40\" width=\"190\" height=\"22\" rx=\"4\" fill=\"rgba(245,165,36,0.15)\" stroke=\"#f5a524\"/>\n                        <text x=\"321\" y=\"55\" class=\"vr-simu\" text-anchor=\"middle\">SIMULATION DE DÉFAUT ACTIVE</text>\n                    </g>\n                </svg>\n            </section>\n\n            <!-- ===== Commande ===== -->\n            <section class=\"hmi-panneau hmi-commande\">\n                <div class=\"hmi-panneau-titre\"><span>Commande</span></div>\n\n                <div class=\"hmi-modes\">\n                    <button :class=\"{ actif: !e.manuel }\" :disabled=\"!e.comm || e.cycleEnCours\" @click=\"changerMode(false)\">AUTOMATIQUE</button>\n                    <button :class=\"{ actif: e.manuel }\" :disabled=\"!e.comm || e.cycleEnCours\" @click=\"changerMode(true)\">MANUEL</button>\n                </div>\n                <div v-if=\"e.cycleEnCours\" class=\"hmi-aide\">Changement de mode impossible pendant un cycle : arrêtez d'abord le cycle.</div>\n\n                <!-- Mode automatique -->\n                <template v-if=\"!e.manuel\">\n                    <div class=\"hmi-boutons\">\n                        <button class=\"hmi-bouton marche\" :class=\"{ actif: e.comm && e.cycleEnCours }\"\n                                :disabled=\"!e.comm || e.cycleEnCours || !!e.defauts\" @click=\"action('depart')\">\n                            <span class=\"hmi-bouton-icone\">▶</span>\n                            <span><b>DÉPART CYCLE</b><small>Cycle continu</small></span>\n                        </button>\n                        <button class=\"hmi-bouton arret\" :class=\"{ attente: e.arretFinCycle }\"\n                                :disabled=\"!e.comm || !e.cycleEnCours || e.arretFinCycle\" @click=\"action('arret')\">\n                            <span class=\"hmi-bouton-icone\">■</span>\n                            <span><b>ARRÊT CYCLE</b><small>{{ e.arretFinCycle ? 'Arrêt en fin de cycle…' : 'En fin de cycle' }}</small></span>\n                        </button>\n                    </div>\n                    <div class=\"hmi-grafcet\">\n                        <template v-for=\"(g, i) in grafcet\" :key=\"'gr' + g.n\">\n                            <div class=\"hmi-etape\" :class=\"{ active: e.comm && e.etape === g.n }\">\n                                <b>{{ g.n }}</b><span>{{ g.nom }}</span><small>{{ g.action }}</small>\n                            </div>\n                            <div class=\"hmi-transition\">{{ g.transition }}</div>\n                        </template>\n                    </div>\n                </template>\n\n                <!-- Mode manuel -->\n                <template v-else>\n                    <div class=\"hmi-boutons\">\n                        <button class=\"hmi-bouton jog sortie\" :class=\"{ actif: e.comm && e.y1 }\"\n                                :disabled=\"!e.comm || !!e.defauts || e.b2\"\n                                @pointerdown.prevent=\"appuiJog($event, 'sortie')\" @pointerup=\"relacheJog('sortie')\"\n                                @pointercancel=\"relacheJog('sortie')\" @contextmenu.prevent>\n                            <span class=\"hmi-bouton-icone\">▲</span>\n                            <span><b>SORTIR</b><small>Y1 · maintenir appuyé</small></span>\n                        </button>\n                        <button class=\"hmi-bouton jog rentree\" :class=\"{ actif: e.comm && e.y2 }\"\n                                :disabled=\"!e.comm || !!e.defauts || e.b1\"\n                                @pointerdown.prevent=\"appuiJog($event, 'rentree')\" @pointerup=\"relacheJog('rentree')\"\n                                @pointercancel=\"relacheJog('rentree')\" @contextmenu.prevent>\n                            <span class=\"hmi-bouton-icone\">▼</span>\n                            <span><b>RENTRER</b><small>Y2 · maintenir appuyé</small></span>\n                        </button>\n                    </div>\n                    <div class=\"hmi-aide\">Commande à action maintenue : la tige s'arrête dès que le bouton est relâché ou en fin de course.</div>\n                </template>\n\n                <div class=\"hmi-securite\">\n                    <button class=\"hmi-au\" :class=\"{ enclenche: e.au }\" :disabled=\"!e.comm\" @click=\"action('au', { actif: !e.au })\">\n                        <span class=\"hmi-au-champignon\"></span>\n                        <span class=\"hmi-au-texte\">\n                            <b>ARRÊT D'URGENCE</b>\n                            <small>{{ e.au ? 'Enclenché — cliquer pour déverrouiller' : 'Coupe immédiatement Y1 et Y2' }}</small>\n                        </span>\n                    </button>\n                    <button class=\"hmi-rearmer\" :disabled=\"!e.comm || (!e.defauts && !e.alarmes.length)\" @click=\"action('acquitter')\">\n                        ⟲ Acquitter / Réarmer\n                    </button>\n                </div>\n            </section>\n\n            <!-- ===== Alarmes et journal ===== -->\n            <section class=\"hmi-panneau hmi-alarmes\">\n                <div class=\"hmi-onglets\">\n                    <button :class=\"{ actif: onglet === 'alarmes' }\" @click=\"onglet = 'alarmes'\">\n                        Alarmes <span class=\"hmi-compteur\" :class=\"{ rouge: nbNonAcquittees }\">{{ e.alarmes.length }}</span>\n                    </button>\n                    <button :class=\"{ actif: onglet === 'journal' }\" @click=\"onglet = 'journal'\">Journal</button>\n                    <button class=\"hmi-acquitter\" :disabled=\"!e.comm || (!e.defauts && !e.alarmes.length)\" @click=\"action('acquitter')\">Acquitter</button>\n                </div>\n                <div v-if=\"onglet === 'alarmes'\" class=\"hmi-liste\">\n                    <div v-if=\"!e.alarmes.length\" class=\"hmi-vide\">✓ Aucune alarme</div>\n                    <div v-for=\"a in e.alarmes\" :key=\"a.id\" class=\"hmi-alarme\" :class=\"{ active: a.active, 'non-acq': !a.acquittee }\">\n                        <span class=\"hmi-temps\">{{ heure(a.t) }}</span>\n                        <span class=\"hmi-texte\" :title=\"a.texte\">{{ a.texte }}</span>\n                        <span class=\"hmi-statut-alarme\">{{ a.active ? (a.acquittee ? 'ACTIVE · ACQ' : 'ACTIVE') : 'DISPARUE' }}</span>\n                    </div>\n                    <div v-if=\"e.alarmes.some(a => a.code === 'AU' && a.active)\" class=\"hmi-aide\">\n                        Déverrouillez l'arrêt d'urgence puis cliquez sur « Acquitter / Réarmer ».\n                    </div>\n                </div>\n                <div v-else class=\"hmi-liste\">\n                    <div v-if=\"!e.journal.length\" class=\"hmi-vide\">Journal vide</div>\n                    <div v-for=\"(j, i) in e.journal\" :key=\"j.t + '-' + i\" class=\"hmi-evenement\">\n                        <span class=\"hmi-temps\">{{ heure(j.t) }}</span>\n                        <i class=\"hmi-type\" :class=\"j.type\"></i>\n                        <span class=\"hmi-texte\" :title=\"j.texte\">{{ j.texte }}</span>\n                    </div>\n                </div>\n            </section>\n\n            <!-- ===== Tendance ===== -->\n            <section class=\"hmi-panneau hmi-tendance\">\n                <div class=\"hmi-panneau-titre\">\n                    <span>Tendance — 60 s</span>\n                    <span class=\"hmi-legende-courbe\">\n                        <i class=\"trait\"></i>Position\n                        <i class=\"zone y1\"></i>Y1\n                        <i class=\"zone y2\"></i>Y2\n                    </span>\n                </div>\n                <svg class=\"hmi-svg\" viewBox=\"0 0 640 220\" preserveAspectRatio=\"none\">\n                    <defs>\n                        <linearGradient id=\"vr-aire\" x1=\"0\" x2=\"0\" y1=\"0\" y2=\"1\">\n                            <stop offset=\"0\" stop-color=\"#3aa3ff\" stop-opacity=\"0.35\"/>\n                            <stop offset=\"1\" stop-color=\"#3aa3ff\" stop-opacity=\"0\"/>\n                        </linearGradient>\n                    </defs>\n                    <rect v-for=\"(z, i) in zones\" :key=\"'z' + i\" :x=\"z.x\" y=\"10\" :width=\"z.w\" height=\"186\" :fill=\"z.y1 ? 'rgba(47,179,68,0.14)' : 'rgba(229,72,77,0.14)'\"/>\n                    <g v-for=\"v in [0, 25, 50, 75, 100]\" :key=\"'h' + v\">\n                        <line x1=\"40\" x2=\"630\" :y1=\"yCourbe(v)\" :y2=\"yCourbe(v)\" stroke=\"#2c333b\"/>\n                        <text x=\"34\" :y=\"yCourbe(v) + 4\" class=\"vr-graduation\" text-anchor=\"end\">{{ v }}</text>\n                    </g>\n                    <g v-for=\"s in [60, 50, 40, 30, 20, 10, 0]\" :key=\"'v' + s\">\n                        <line :x1=\"xCourbe(-s)\" :x2=\"xCourbe(-s)\" y1=\"10\" y2=\"196\" stroke=\"#2c333b\"/>\n                        <text :x=\"xCourbe(-s)\" y=\"212\" class=\"vr-graduation\" :text-anchor=\"s === 60 ? 'start' : (s ? 'middle' : 'end')\">{{ s ? '-' + s + ' s' : '0 s' }}</text>\n                    </g>\n                    <path v-if=\"courbe\" :d=\"courbe.aire\" fill=\"url(#vr-aire)\"/>\n                    <path v-if=\"courbe\" :d=\"courbe.ligne\" fill=\"none\" stroke=\"#3aa3ff\" stroke-width=\"2\" vector-effect=\"non-scaling-stroke\"/>\n                </svg>\n            </section>\n\n            <!-- ===== Mesures ===== -->\n            <section class=\"hmi-panneau hmi-mesures\">\n                <div class=\"hmi-panneau-titre\"><span>Mesures</span></div>\n                <div class=\"hmi-position\">\n                    <span class=\"hmi-valeur\">{{ e.comm ? e.position.toFixed(1) : '---.-' }}</span>\n                    <span class=\"hmi-unite\">mm</span>\n                    <span class=\"hmi-etat\" :class=\"classeEtat\">{{ texteEtat }}</span>\n                </div>\n                <div class=\"hmi-es\">\n                    <div v-for=\"s in signaux\" :key=\"s.nom\" class=\"hmi-signal\">\n                        <i class=\"hmi-led\" :class=\"[{ on: e.comm && s.on }, s.couleur]\"></i>\n                        <b>{{ s.nom }}</b><small>{{ s.libelle }}</small>\n                    </div>\n                </div>\n                <div class=\"hmi-tuiles\">\n                    <div class=\"hmi-tuile\"><label>Cycles</label><span class=\"gros\">{{ e.cycles }}</span></div>\n                    <div class=\"hmi-tuile\"><label>Dernière sortie</label><span>{{ duree(e.dureeSortie) }}</span></div>\n                    <div class=\"hmi-tuile\"><label>Dernière rentrée</label><span>{{ duree(e.dureeRentree) }}</span></div>\n                </div>\n            </section>\n\n            <!-- ===== Paramètres et simulation ===== -->\n            <section class=\"hmi-panneau hmi-reglages\">\n                <div class=\"hmi-panneau-titre\"><span>Paramètres automate</span></div>\n                <div class=\"hmi-parametres\">\n                    <label>Temporisation en position haute<input type=\"number\" min=\"0\" max=\"60\" step=\"0.1\" v-model=\"saisie.tempoHaut\" @input=\"modifie = true\"><em>s</em></label>\n                    <label>Temps max. de sortie (B2)<input type=\"number\" min=\"1\" max=\"60\" step=\"0.1\" v-model=\"saisie.timeoutSortie\" @input=\"modifie = true\"><em>s</em></label>\n                    <label>Temps max. de rentrée (B1)<input type=\"number\" min=\"1\" max=\"60\" step=\"0.1\" v-model=\"saisie.timeoutRentree\" @input=\"modifie = true\"><em>s</em></label>\n                </div>\n                <div class=\"hmi-actions-param\">\n                    <span v-if=\"erreurSaisie\" class=\"hmi-erreur\">{{ erreurSaisie }}</span>\n                    <button class=\"hmi-bouton-secondaire\" :disabled=\"!modifie\" @click=\"annulerSaisie\">Annuler</button>\n                    <button class=\"hmi-bouton-primaire\" :disabled=\"!e.comm || !modifie || !!erreurSaisie\" @click=\"appliquerParametres\">Appliquer</button>\n                </div>\n\n                <div class=\"hmi-panneau-titre sous\"><span>Simulation de défauts</span><span class=\"hmi-tag\">TEST</span></div>\n                <label class=\"hmi-interrupteur\">\n                    <input type=\"checkbox\" :checked=\"e.simuBlocage\" :disabled=\"!e.comm\" @change=\"action('simu', { defaut: 'blocage', actif: $event.target.checked })\">\n                    <span class=\"hmi-curseur\"></span>\n                    <span><b>Blocage mécanique</b><small>La tige ne bouge plus → défaut « vérin bloqué » après 1 s</small></span>\n                </label>\n                <label class=\"hmi-interrupteur\">\n                    <input type=\"checkbox\" :checked=\"e.simuPression\" :disabled=\"!e.comm\" @change=\"action('simu', { defaut: 'pression', actif: $event.target.checked })\">\n                    <span class=\"hmi-curseur\"></span>\n                    <span><b>Pression d'air basse</b><small>Vitesse réduite à 30 % → dépassement du temps de sortie</small></span>\n                </label>\n            </section>\n        </main>\n\n        <footer class=\"hmi-pied\">\n            <span>Modbus TCP · 127.0.0.1:502 · esclave 1 · scrutation 200 ms</span>\n            <span>Étape Grafcet : {{ e.comm ? e.etape + ' — ' + e.nomEtape : '—' }}</span>\n            <span>Dernière mesure : {{ e.comm ? heure(e.t) : '—' }}</span>\n        </footer>\n    </div>\n</template>\n\n<script>\n    export default {\n        data() {\n            return {\n                maintenant: Date.now(),\n                historique: [],\n                onglet: 'alarmes',\n                horloge: null,\n                fenetreMs: 60000,\n                jogActif: { sortie: false, rentree: false },\n                saisie: { tempoHaut: '', timeoutSortie: '', timeoutRentree: '' },\n                modifie: false,\n                grafcet: [\n                    { n: 0, nom: 'Repos', action: '', transition: 'Départ' },\n                    { n: 1, nom: 'Sortie', action: 'Y1', transition: 'B2' },\n                    { n: 2, nom: 'Tempo', action: 't', transition: 't écoulé' },\n                    { n: 3, nom: 'Rentrée', action: 'Y2', transition: 'B1' }\n                ]\n            }\n        },\n        computed: {\n            e() {\n                const p = this.msg && this.msg.payload\n                if (p && typeof p.position === 'number') return p\n                return {\n                    t: 0, comm: false, position: 0, etape: 0, nomEtape: 'Repos', defauts: 0, cycles: 0,\n                    dureeSortie: null, dureeRentree: null, y1: false, y2: false, b1: false, b2: false,\n                    cycleEnCours: false, arretFinCycle: false, manuel: false, au: false,\n                    simuBlocage: false, simuPression: false, parametres: null, sens: 'descente', fin: null,\n                    etatMachine: { code: 'hors-ligne', texte: 'CONNEXION…' }, alarmes: [], journal: []\n                }\n            },\n            dateLongue() {\n                return new Date(this.maintenant).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })\n            },\n            couleurSens() {\n                if (!this.e.comm) return '#5b6672'\n                return this.e.sens === 'montee' ? '#2fb344' : '#e5484d'\n            },\n            hauteurBarre() {\n                return this.borne(this.e.position) * 2.9\n            },\n            ySommetTige() {\n                return 160 - this.borne(this.e.position) * 1.2\n            },\n            yPiston() {\n                return 306 - this.borne(this.e.position) * 1.1\n            },\n            texteEtat() {\n                if (!this.e.comm) return 'Hors ligne'\n                if (this.e.defauts) return 'En défaut'\n                if (this.e.y1) return 'Sortie en cours'\n                if (this.e.y2) return 'Rentrée en cours'\n                if (this.e.b2) return 'Tige sortie'\n                if (this.e.b1) return 'Tige rentrée'\n                return 'Arrêt en position'\n            },\n            classeEtat() {\n                if (!this.e.comm || this.e.defauts) return 'defaut'\n                if (this.e.y1) return 'montee'\n                if (this.e.y2) return 'descente'\n                return 'repos'\n            },\n            signaux() {\n                const e = this.e\n                return [\n                    { nom: 'Y1', libelle: 'Bobine sortie', on: e.y1, couleur: 'ambre' },\n                    { nom: 'Y2', libelle: 'Bobine rentrée', on: e.y2, couleur: 'ambre' },\n                    { nom: 'B1', libelle: 'Tige rentrée', on: e.b1, couleur: 'vert' },\n                    { nom: 'B2', libelle: 'Tige sortie', on: e.b2, couleur: 'vert' }\n                ]\n            },\n            nbNonAcquittees() {\n                return this.e.alarmes.filter(a => !a.acquittee).length\n            },\n            bandeau() {\n                const nonAcq = this.e.alarmes.filter(a => !a.acquittee)\n                const actives = this.e.alarmes.filter(a => a.active)\n                if (nonAcq.length) {\n                    return { classe: 'alarme clignote-fond', icone: '⚠', texte: nonAcq[0].texte + (nonAcq.length > 1 ? '  (+' + (nonAcq.length - 1) + ')' : '') }\n                }\n                if (actives.length) return { classe: 'alarme', icone: '⚠', texte: actives[0].texte }\n                if (this.e.comm && (this.e.simuBlocage || this.e.simuPression)) {\n                    return { classe: 'avertissement', icone: '!', texte: 'Simulation de défaut active' }\n                }\n                return { classe: 'normal', icone: '✓', texte: 'Fonctionnement normal — aucune alarme active' }\n            },\n            erreurSaisie() {\n                const s = this.saisie\n                const ok = (v, min) => v !== '' && Number.isFinite(Number(v)) && Number(v) >= min && Number(v) <= 60\n                if (!ok(s.tempoHaut, 0)) return 'Temporisation : 0 à 60 s'\n                if (!ok(s.timeoutSortie, 1) || !ok(s.timeoutRentree, 1)) return 'Temps max. : 1 à 60 s'\n                return ''\n            },\n            courbe() {\n                const pts = this.historique\n                if (pts.length < 2) return null\n                const ligne = pts.map((p, i) => (i ? 'L' : 'M') + this.xTemps(p.t).toFixed(1) + ' ' + this.yCourbe(p.p).toFixed(1)).join(' ')\n                const x0 = this.xTemps(pts[0].t).toFixed(1)\n                const x1 = this.xTemps(pts[pts.length - 1].t).toFixed(1)\n                return { ligne, aire: ligne + ' L' + x1 + ' 196 L' + x0 + ' 196 Z' }\n            },\n            zones() {\n                const zones = []\n                const pts = this.historique\n                let debut = null\n                let y1 = false\n                pts.forEach((p, i) => {\n                    const actif = p.y1 || p.y2\n                    if (debut !== null && (!actif || p.y1 !== y1 || i === pts.length - 1)) {\n                        const x0 = this.xTemps(debut)\n                        zones.push({ x: x0, w: Math.max(1, this.xTemps(p.t) - x0), y1 })\n                        debut = null\n                    }\n                    if (actif && debut === null) { debut = p.t; y1 = p.y1 }\n                })\n                return zones\n            }\n        },\n        watch: {\n            msg(m) {\n                const p = m && m.payload\n                if (!p || typeof p.position !== 'number' || !p.comm) return\n                this.historique.push({ t: p.t, p: p.position, y1: p.y1, y2: p.y2 })\n                const limite = p.t - this.fenetreMs\n                while (this.historique.length && this.historique[0].t < limite) this.historique.shift()\n                if (!this.modifie && p.parametres) {\n                    this.saisie = { ...p.parametres }\n                }\n                if (!p.manuel) this.jogActif = { sortie: false, rentree: false }\n            }\n        },\n        methods: {\n            borne(v) {\n                return Math.max(0, Math.min(100, v))\n            },\n            couleurConduite(sousPression) {\n                if (!this.e.comm) return '#3a424c'\n                return sousPression ? '#3aa3ff' : '#5b6672'\n            },\n            action(nom, donnees) {\n                this.send({ topic: 'ihm', payload: { action: nom, ...(donnees || {}) } })\n            },\n            changerMode(manuel) {\n                if (manuel === this.e.manuel) return\n                this.relacherTout()\n                this.action('mode', { manuel })\n            },\n            appuiJog(evenement, sens) {\n                if (evenement.currentTarget.disabled) return\n                evenement.currentTarget.setPointerCapture(evenement.pointerId)\n                if (this.jogActif[sens]) return\n                this.jogActif[sens] = true\n                this.action('jog', { sens, actif: true })\n            },\n            relacheJog(sens) {\n                if (!this.jogActif[sens]) return\n                this.jogActif[sens] = false\n                this.action('jog', { sens, actif: false })\n            },\n            relacherTout() {\n                this.relacheJog('sortie')\n                this.relacheJog('rentree')\n            },\n            appliquerParametres() {\n                this.action('parametres', {\n                    tempoHaut: Number(this.saisie.tempoHaut),\n                    timeoutSortie: Number(this.saisie.timeoutSortie),\n                    timeoutRentree: Number(this.saisie.timeoutRentree)\n                })\n                this.modifie = false\n            },\n            annulerSaisie() {\n                this.modifie = false\n                if (this.e.parametres) this.saisie = { ...this.e.parametres }\n            },\n            heure(t) {\n                return t ? new Date(t).toLocaleTimeString('fr-FR') : '—'\n            },\n            duree(s) {\n                return typeof s === 'number' ? s.toFixed(1).replace('.', ',') + ' s' : '—'\n            },\n            yCourbe(v) {\n                return 196 - this.borne(v) * 1.86\n            },\n            xCourbe(s) {\n                return 630 + (s * 1000 / this.fenetreMs) * 590\n            },\n            xTemps(t) {\n                const ref = this.historique.length ? this.historique[this.historique.length - 1].t : t\n                return this.xCourbe((t - ref) / 1000)\n            }\n        },\n        mounted() {\n            this.horloge = setInterval(() => { this.maintenant = Date.now() }, 1000)\n            this.surPerteFocus = () => this.relacherTout()\n            window.addEventListener('blur', this.surPerteFocus)\n        },\n        unmounted() {\n            clearInterval(this.horloge)\n            window.removeEventListener('blur', this.surPerteFocus)\n            this.relacherTout()\n        }\n    }\n</script>\n\n<style>\n    .hmi {\n        --fond: #15191e;\n        --panneau: #1e242b;\n        --bord: #2e3640;\n        --texte: #d7dde4;\n        --texte-2: #8b96a3;\n        --bleu: #3aa3ff;\n        --vert: #2fb344;\n        --rouge: #e5484d;\n        --ambre: #f5a524;\n        font-family: \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif;\n        color: var(--texte);\n        background: var(--fond);\n        font-variant-numeric: tabular-nums;\n        display: flex;\n        flex-direction: column;\n        gap: 12px;\n        min-height: calc(100vh - 24px);\n    }\n    .hmi button { font-family: inherit; }\n\n    /* Bandeau */\n    .hmi-entete {\n        display: grid; grid-template-columns: auto 1fr auto; gap: 16px; align-items: center;\n        background: var(--panneau); border: 1px solid var(--bord); border-radius: 6px; padding: 10px 16px;\n    }\n    .hmi-ident { display: flex; align-items: center; gap: 12px; }\n    .hmi-logo {\n        width: 40px; height: 40px; border-radius: 6px; background: linear-gradient(135deg, #1f6fb8, #3aa3ff);\n        color: #fff; font-weight: 700; display: grid; place-items: center; letter-spacing: 1px;\n    }\n    .hmi-ligne { font-size: 12px; color: var(--texte-2); text-transform: uppercase; letter-spacing: 0.08em; }\n    .hmi-titre { font-size: 18px; font-weight: 600; }\n    .hmi-bandeau { display: flex; align-items: center; gap: 10px; padding: 8px 14px; border-radius: 4px; font-weight: 600; font-size: 14px; min-width: 0; }\n    .hmi-bandeau-texte { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }\n    .hmi-bandeau.normal { background: rgba(47, 179, 68, 0.12); color: #7fd68f; border: 1px solid rgba(47, 179, 68, 0.35); }\n    .hmi-bandeau.alarme { background: rgba(229, 72, 77, 0.18); color: #ff9a9d; border: 1px solid var(--rouge); }\n    .hmi-bandeau.avertissement { background: rgba(245, 165, 36, 0.12); color: #ffc764; border: 1px solid rgba(245, 165, 36, 0.5); }\n    .hmi-bandeau-icone { font-size: 16px; }\n    .hmi-statuts { display: flex; align-items: center; gap: 8px; }\n    .hmi-pastille {\n        display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; letter-spacing: 0.06em;\n        padding: 5px 10px; border-radius: 999px; border: 1px solid var(--bord); color: var(--texte-2); white-space: nowrap;\n    }\n    .hmi-pastille i { width: 8px; height: 8px; border-radius: 50%; background: var(--texte-2); }\n    .hmi-pastille.ok { color: #7fd68f; border-color: rgba(47, 179, 68, 0.4); }\n    .hmi-pastille.ok i { background: var(--vert); box-shadow: 0 0 6px var(--vert); }\n    .hmi-pastille.defaut, .hmi-pastille.au, .hmi-pastille.hors-ligne { color: #ff9a9d; border-color: var(--rouge); }\n    .hmi-pastille.defaut i, .hmi-pastille.au i, .hmi-pastille.hors-ligne i { background: var(--rouge); }\n    .hmi-pastille.au { background: var(--rouge); color: #fff; }\n    .hmi-pastille.au i { background: #fff; }\n    .hmi-pastille.neutre i { background: var(--bleu); }\n    .hmi-pastille.cycle { color: #7fd68f; border-color: rgba(47, 179, 68, 0.4); }\n    .hmi-pastille.cycle i { background: var(--vert); animation: hmi-clignote 1s step-start infinite; }\n    .hmi-pastille.manuel { color: #ffc764; border-color: rgba(245, 165, 36, 0.5); }\n    .hmi-pastille.manuel i { background: var(--ambre); }\n    .hmi-horloge { text-align: right; padding-left: 8px; border-left: 1px solid var(--bord); }\n    .hmi-heure { font-size: 20px; font-weight: 600; }\n    .hmi-date { font-size: 11px; color: var(--texte-2); text-transform: capitalize; }\n\n    /* Grille */\n    .hmi-grille { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr) minmax(0, 1fr); gap: 12px; flex: 1; }\n    .hmi-panneau {\n        background: var(--panneau); border: 1px solid var(--bord); border-radius: 6px; padding: 12px 16px;\n        display: flex; flex-direction: column; min-width: 0;\n    }\n    .hmi-synoptique.en-defaut { border-color: var(--rouge); box-shadow: inset 0 0 0 1px var(--rouge); }\n    .hmi-panneau-titre {\n        display: flex; justify-content: space-between; align-items: center; gap: 8px;\n        font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;\n        color: var(--texte-2); margin-bottom: 10px; min-height: 26px;\n    }\n    .hmi-panneau-titre.sous { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--bord); }\n    .hmi-svg { width: 100%; flex: 1; min-height: 220px; display: block; }\n    .hmi-synoptique .hmi-svg { max-height: 380px; }\n    .hmi-tendance .hmi-svg { min-height: 170px; max-height: 230px; }\n    .hmi-aide { font-size: 12px; color: var(--texte-2); margin-top: 8px; line-height: 1.4; }\n    .hmi-tag { font-size: 10px; color: var(--ambre); border: 1px solid rgba(245, 165, 36, 0.5); border-radius: 3px; padding: 1px 6px; }\n\n    .hmi-butee { font-size: 13px; letter-spacing: 0.06em; color: #fff; padding: 4px 12px; border-radius: 4px; }\n    .hmi-butee.max { background: var(--vert); }\n    .hmi-butee.min { background: var(--rouge); }\n\n    /* SVG */\n    .vr-graduation { font-size: 11px; fill: #8b96a3; }\n    .vr-legende { font-size: 11px; fill: #8b96a3; font-weight: 600; }\n    .vr-capteur { font-size: 12px; fill: #c9d1d9; font-weight: 700; }\n    .vr-charge { font-size: 10px; fill: #c9d1d9; font-weight: 700; letter-spacing: 0.08em; }\n    .vr-repere { font-size: 11px; fill: #8b96a3; }\n    .vr-bobine { font-size: 10px; font-weight: 700; }\n    .vr-simu { font-size: 10px; fill: #f5a524; font-weight: 700; letter-spacing: 0.06em; }\n    .vr-case { fill: #20262d; stroke: #5b6672; stroke-width: 2; }\n    .vr-case.active { fill: rgba(58, 163, 255, 0.15); stroke: #3aa3ff; }\n    .vr-symbole line, .vr-symbole path { stroke: #c9d1d9; stroke-width: 1.5; fill: none; }\n    .vr-anim { transition: all 0.2s linear; }\n    .vr-led { filter: drop-shadow(0 0 4px #3ddc68); }\n    .vr-flux { stroke-dasharray: 8 6; animation: vr-flux 0.6s linear infinite; }\n    @keyframes vr-flux { to { stroke-dashoffset: -14; } }\n\n    /* Commande */\n    .hmi-modes { display: grid; grid-template-columns: 1fr 1fr; background: #181d23; border: 1px solid var(--bord); border-radius: 6px; padding: 3px; gap: 3px; margin-bottom: 12px; }\n    .hmi-modes button {\n        background: none; border: none; color: var(--texte-2); padding: 8px; border-radius: 4px;\n        font-size: 12px; font-weight: 700; letter-spacing: 0.08em; cursor: pointer;\n    }\n    .hmi-modes button.actif { background: #2e3640; color: var(--texte); box-shadow: inset 0 -2px 0 var(--bleu); }\n    .hmi-modes button:disabled { cursor: not-allowed; }\n    .hmi-modes button:disabled:not(.actif) { opacity: 0.4; }\n\n    .hmi-boutons { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }\n    .hmi-bouton {\n        display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 6px; cursor: pointer; text-align: left;\n        background: #252c34; color: var(--texte); border: 2px solid var(--bord); transition: background 0.15s, border-color 0.15s;\n        touch-action: none; user-select: none;\n    }\n    .hmi-bouton b { display: block; font-size: 14px; letter-spacing: 0.06em; }\n    .hmi-bouton small { display: block; font-size: 11px; color: var(--texte-2); }\n    .hmi-bouton-icone { flex: none; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; font-size: 14px; background: #2e3640; }\n    .hmi-bouton.marche, .hmi-bouton.sortie { border-color: rgba(47, 179, 68, 0.5); }\n    .hmi-bouton.marche .hmi-bouton-icone, .hmi-bouton.sortie .hmi-bouton-icone { color: var(--vert); }\n    .hmi-bouton.arret, .hmi-bouton.rentree { border-color: rgba(229, 72, 77, 0.5); }\n    .hmi-bouton.arret .hmi-bouton-icone, .hmi-bouton.rentree .hmi-bouton-icone { color: var(--rouge); }\n    .hmi-bouton:not(:disabled):hover { background: #2c343d; }\n    .hmi-bouton.marche.actif, .hmi-bouton.sortie.actif { background: var(--vert); border-color: var(--vert); }\n    .hmi-bouton.rentree.actif { background: var(--rouge); border-color: var(--rouge); }\n    .hmi-bouton.arret.attente { border-color: var(--ambre); }\n    .hmi-bouton.arret.attente small { color: var(--ambre); animation: hmi-clignote 1s step-start infinite; }\n    .hmi-bouton.actif small { color: rgba(255, 255, 255, 0.85); }\n    .hmi-bouton.actif .hmi-bouton-icone { background: rgba(0, 0, 0, 0.2); color: #fff; }\n    .hmi-bouton:disabled { cursor: not-allowed; }\n    .hmi-bouton:disabled:not(.actif):not(.attente) { opacity: 0.4; }\n\n    .hmi-grafcet { display: flex; align-items: stretch; flex-wrap: wrap; gap: 4px; margin-top: 12px; }\n    .hmi-etape {\n        flex: 1; min-width: 56px; border: 2px solid var(--bord); border-radius: 4px; padding: 6px 4px; text-align: center;\n        display: flex; flex-direction: column; gap: 1px; background: #181d23;\n    }\n    .hmi-etape b { font-size: 13px; }\n    .hmi-etape span { font-size: 11px; color: var(--texte-2); }\n    .hmi-etape small { font-size: 10px; color: var(--ambre); min-height: 13px; }\n    .hmi-etape.active { border-color: var(--bleu); background: rgba(58, 163, 255, 0.15); }\n    .hmi-etape.active span { color: var(--texte); }\n    .hmi-transition { align-self: center; font-size: 10px; color: var(--texte-2); writing-mode: horizontal-tb; white-space: nowrap; }\n    .hmi-transition::before { content: '→ '; }\n\n    .hmi-securite { display: flex; gap: 10px; margin-top: auto; padding-top: 14px; align-items: stretch; }\n    .hmi-au {\n        flex: 1; display: flex; align-items: center; gap: 12px; padding: 10px 12px; cursor: pointer; text-align: left;\n        background: #2a2416; border: 2px solid #f5c400; border-radius: 6px; color: var(--texte);\n    }\n    .hmi-au-champignon {\n        flex: none; width: 40px; height: 40px; border-radius: 50%;\n        background: radial-gradient(circle at 35% 35%, #ff7a7e, #c81e24 60%, #8f1216);\n        box-shadow: 0 0 0 4px #f5c400, 0 3px 0 4px #b38f00;\n    }\n    .hmi-au.enclenche { background: var(--rouge); border-color: var(--rouge); }\n    .hmi-au.enclenche .hmi-au-champignon { box-shadow: 0 0 0 4px #f5c400; transform: scale(0.9); }\n    .hmi-au-texte b { display: block; font-size: 13px; letter-spacing: 0.06em; }\n    .hmi-au-texte small { display: block; font-size: 11px; color: var(--texte-2); }\n    .hmi-au.enclenche .hmi-au-texte small { color: #fff; }\n    .hmi-au:disabled { opacity: 0.5; cursor: not-allowed; }\n    .hmi-rearmer {\n        flex: none; padding: 0 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 700;\n        background: transparent; border: 2px solid var(--ambre); color: var(--ambre);\n    }\n    .hmi-rearmer:not(:disabled):hover { background: rgba(245, 165, 36, 0.12); }\n    .hmi-rearmer:disabled { opacity: 0.35; cursor: not-allowed; }\n\n    /* Mesures */\n    .hmi-position { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }\n    .hmi-valeur { font-size: 44px; font-weight: 600; line-height: 1; }\n    .hmi-unite { font-size: 18px; color: var(--texte-2); }\n    .hmi-etat {\n        margin-left: auto; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;\n        padding: 4px 10px; border-radius: 4px; border: 1px solid var(--bord); color: var(--texte-2);\n    }\n    .hmi-etat.montee { color: #7fd68f; border-color: rgba(47, 179, 68, 0.5); }\n    .hmi-etat.descente { color: #ff9a9d; border-color: rgba(229, 72, 77, 0.5); }\n    .hmi-etat.defaut { color: #fff; background: var(--rouge); border-color: var(--rouge); }\n    .hmi-es { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; margin-top: 14px; }\n    .hmi-signal { background: #181d23; border: 1px solid var(--bord); border-radius: 4px; padding: 8px; display: grid; grid-template-columns: auto 1fr; column-gap: 8px; align-items: center; }\n    .hmi-signal b { font-size: 14px; }\n    .hmi-signal small { grid-column: 1 / -1; font-size: 10px; color: var(--texte-2); margin-top: 2px; }\n    .hmi-led { width: 10px; height: 10px; border-radius: 50%; background: #3a424c; display: inline-block; }\n    .hmi-led.vert.on { background: #3ddc68; box-shadow: 0 0 6px #3ddc68; }\n    .hmi-led.ambre.on { background: var(--ambre); box-shadow: 0 0 6px var(--ambre); }\n    .hmi-tuiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin-top: 6px; }\n    .hmi-tuile { background: #181d23; border: 1px solid var(--bord); border-radius: 4px; padding: 8px 10px; display: flex; flex-direction: column; gap: 4px; }\n    .hmi-tuile label { font-size: 11px; color: var(--texte-2); }\n    .hmi-tuile span { font-size: 16px; font-weight: 600; }\n    .hmi-tuile span.gros { font-size: 20px; }\n\n    /* Paramètres et simulation */\n    .hmi-parametres { display: flex; flex-direction: column; gap: 6px; }\n    .hmi-parametres label { display: grid; grid-template-columns: 1fr 80px 14px; align-items: center; gap: 8px; font-size: 13px; }\n    .hmi-parametres input {\n        background: #181d23; border: 1px solid var(--bord); border-radius: 4px; color: var(--texte);\n        padding: 5px 8px; font: inherit; text-align: right; width: 100%;\n    }\n    .hmi-parametres input:focus { outline: none; border-color: var(--bleu); }\n    .hmi-parametres em { font-style: normal; color: var(--texte-2); font-size: 12px; }\n    .hmi-actions-param { display: flex; justify-content: flex-end; align-items: center; gap: 8px; margin-top: 8px; }\n    .hmi-erreur { font-size: 12px; color: #ff9a9d; margin-right: auto; }\n    .hmi-bouton-secondaire, .hmi-bouton-primaire { border-radius: 4px; padding: 6px 14px; font-size: 12px; font-weight: 600; cursor: pointer; }\n    .hmi-bouton-secondaire { background: transparent; color: var(--texte-2); border: 1px solid var(--bord); }\n    .hmi-bouton-primaire { background: var(--bleu); color: #fff; border: 1px solid var(--bleu); }\n    .hmi-bouton-secondaire:disabled, .hmi-bouton-primaire:disabled { opacity: 0.4; cursor: not-allowed; }\n    .hmi-interrupteur { display: flex; align-items: center; gap: 10px; padding: 6px 0; cursor: pointer; }\n    .hmi-interrupteur input { display: none; }\n    .hmi-curseur { flex: none; width: 34px; height: 18px; border-radius: 999px; background: #3a424c; position: relative; transition: background 0.15s; }\n    .hmi-curseur::after { content: ''; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; border-radius: 50%; background: #c9d1d9; transition: left 0.15s; }\n    .hmi-interrupteur input:checked + .hmi-curseur { background: var(--ambre); }\n    .hmi-interrupteur input:checked + .hmi-curseur::after { left: 18px; background: #fff; }\n    .hmi-interrupteur b { display: block; font-size: 13px; }\n    .hmi-interrupteur small { display: block; font-size: 11px; color: var(--texte-2); }\n\n    /* Tendance */\n    .hmi-legende-courbe { display: flex; align-items: center; gap: 4px; text-transform: none; letter-spacing: 0; font-weight: 400; }\n    .hmi-legende-courbe i { display: inline-block; width: 12px; margin-left: 8px; }\n    .hmi-legende-courbe i.trait { height: 2px; background: var(--bleu); }\n    .hmi-legende-courbe i.zone { height: 10px; }\n    .hmi-legende-courbe i.y1 { background: rgba(47, 179, 68, 0.4); }\n    .hmi-legende-courbe i.y2 { background: rgba(229, 72, 77, 0.4); }\n\n    /* Alarmes / journal */\n    .hmi-onglets { display: flex; gap: 4px; border-bottom: 1px solid var(--bord); margin-bottom: 8px; }\n    .hmi-onglets button {\n        background: none; border: none; color: var(--texte-2); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;\n        padding: 6px 10px 8px; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; display: flex; align-items: center; gap: 6px;\n    }\n    .hmi-onglets button.actif { color: var(--texte); border-bottom-color: var(--bleu); }\n    .hmi-onglets .hmi-acquitter { margin-left: auto; margin-bottom: 4px; border: 1px solid var(--ambre); color: var(--ambre); border-radius: 4px; padding: 4px 12px; }\n    .hmi-onglets .hmi-acquitter:disabled { opacity: 0.35; cursor: not-allowed; }\n    .hmi-compteur { background: #2e3640; color: var(--texte); border-radius: 999px; padding: 0 7px; font-size: 11px; }\n    .hmi-compteur.rouge { background: var(--rouge); color: #fff; }\n    .hmi-liste { overflow-y: auto; max-height: 330px; display: flex; flex-direction: column; gap: 4px; }\n    .hmi-vide { color: #7fd68f; font-size: 13px; padding: 12px 4px; }\n    .hmi-alarme, .hmi-evenement { display: grid; align-items: center; gap: 10px; font-size: 13px; padding: 6px 8px; border-radius: 4px; background: #181d23; border-left: 3px solid var(--bord); }\n    .hmi-alarme { grid-template-columns: auto 1fr auto; color: var(--texte-2); }\n    .hmi-alarme.active { border-left-color: var(--rouge); color: var(--texte); background: rgba(229, 72, 77, 0.1); }\n    .hmi-alarme.active.non-acq { animation: hmi-clignote-bord 1s step-start infinite; }\n    .hmi-alarme.non-acq:not(.active) { border-left-color: var(--ambre); }\n    .hmi-statut-alarme { font-size: 10px; font-weight: 700; letter-spacing: 0.06em; }\n    .hmi-evenement { grid-template-columns: auto auto 1fr; }\n    .hmi-temps { color: var(--texte-2); font-size: 12px; }\n    .hmi-texte { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }\n    .hmi-type { width: 8px; height: 8px; border-radius: 50%; background: var(--texte-2); display: inline-block; }\n    .hmi-type.alarme { background: var(--rouge); }\n    .hmi-type.operateur { background: var(--ambre); }\n    .hmi-type.info { background: var(--bleu); }\n    .hmi-type.simulation { background: #a371f7; }\n\n    .hmi-pied { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-size: 11px; color: var(--texte-2); padding: 0 4px; }\n\n    /* Clignotements */\n    .clignote { animation: hmi-clignote 1s step-start infinite; }\n    .clignote-fond { animation: hmi-clignote-fond 1s step-start infinite; }\n    @keyframes hmi-clignote { 50% { opacity: 0; } }\n    @keyframes hmi-clignote-fond { 50% { background: rgba(229, 72, 77, 0.45); } }\n    @keyframes hmi-clignote-bord { 50% { border-left-color: transparent; } }\n\n    /* Écrans plus étroits */\n    @media (max-width: 1400px) {\n        .hmi-grille { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }\n        .hmi-entete { grid-template-columns: auto 1fr; }\n        .hmi-statuts { grid-column: 1 / -1; flex-wrap: wrap; }\n    }\n    @media (max-width: 900px) {\n        .hmi-grille { grid-template-columns: minmax(0, 1fr); }\n        .hmi-entete { grid-template-columns: 1fr; }\n        .hmi-es { grid-template-columns: repeat(2, minmax(0, 1fr)); }\n    }\n</style>\n",
+        "storeOutMessages": true,
+        "passthru": false,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 690,
+        "y": 420,
+        "wires": [
+            [
+                "fn_modele"
+            ]
+        ]
+    },
+    {
+        "id": "write_modbus",
+        "type": "modbus-flex-write",
+        "z": "tab_verin",
+        "name": "Écritures Modbus (FC5 / FC16)",
+        "showStatusActivities": false,
+        "showErrors": true,
+        "showWarnings": true,
+        "server": "cfg_modbus",
+        "emptyMsgOnFail": false,
+        "keepMsgProperties": false,
+        "x": 960,
+        "y": 200,
+        "wires": [
+            [],
+            []
+        ]
+    }
+]

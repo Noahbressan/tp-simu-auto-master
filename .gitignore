@@ -1,0 +1,14 @@
+# Fichiers Python generes
+__pycache__/
+*.pyc
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Environnement virtuel
+.venv/
+
+# Journaux de test
+*.log
